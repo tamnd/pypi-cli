@@ -409,6 +409,9 @@ func (c *Client) Search(ctx context.Context, query string, limit int) ([]SearchR
 			}
 			return nil, err
 		}
+		if strings.Contains(html, "Client Challenge") || strings.Contains(html, "JavaScript is disabled") {
+			return nil, fmt.Errorf("PyPI search is blocked by a JavaScript challenge from this IP; use pypi.org/search in a browser")
+		}
 		snippets := parseSearchSnippets(html, len(out)+1)
 		if len(snippets) == 0 {
 			break

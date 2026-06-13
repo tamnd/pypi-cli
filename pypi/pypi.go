@@ -512,7 +512,10 @@ func parseDep(s string) Dep {
 		}
 	}
 
-	// Split name from constraint: find first '('
+	// Split name from constraint.
+	// PEP 508 allows two forms:
+	//   "requests (>=2.0)"  — parenthesized constraint
+	//   "requests>=2.0"     — bare constraint (newer style)
 	name := reqStr
 	constraint := ""
 	parenIdx := strings.Index(reqStr, "(")
@@ -522,6 +525,20 @@ func parseDep(s string) Dep {
 		// Remove enclosing parens
 		if strings.HasPrefix(constraint, "(") && strings.HasSuffix(constraint, ")") {
 			constraint = constraint[1 : len(constraint)-1]
+		}
+	} else {
+		// Find the first version operator by scanning for the earliest occurrence.
+		// Two-char operators must be checked before single-char to avoid splitting ">=".
+		firstIdx := -1
+		for _, op := range []string{"!=", "~=", ">=", "<=", "==", "<", ">"} {
+			idx := strings.Index(reqStr, op)
+			if idx > 0 && (firstIdx < 0 || idx < firstIdx) {
+				firstIdx = idx
+			}
+		}
+		if firstIdx > 0 {
+			name = strings.TrimSpace(reqStr[:firstIdx])
+			constraint = strings.TrimSpace(reqStr[firstIdx:])
 		}
 	}
 

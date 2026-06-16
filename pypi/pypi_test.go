@@ -204,6 +204,26 @@ func TestUpdates(t *testing.T) {
 	}
 }
 
+func TestClassifiers(t *testing.T) {
+	body := "Development Status :: 1 - Planning\nDevelopment Status :: 5 - Production/Stable\nLicense :: OSI Approved :: MIT License\n"
+	mux := http.NewServeMux()
+	mux.HandleFunc("/pypi/classifiers/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		_, _ = w.Write([]byte(body))
+	})
+	c := newTestClient(t, mux)
+	classifiers, err := c.Classifiers(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(classifiers) != 3 {
+		t.Fatalf("got %d classifiers, want 3", len(classifiers))
+	}
+	if classifiers[0] != "Development Status :: 1 - Planning" {
+		t.Errorf("first = %q, want 'Development Status :: 1 - Planning'", classifiers[0])
+	}
+}
+
 func TestNewest(t *testing.T) {
 	rssBody := `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">

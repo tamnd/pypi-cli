@@ -95,6 +95,7 @@ Foundation or PyPI.`,
 		app.depsCmd(),
 		app.updatesCmd(),
 		app.newestCmd(),
+		app.classifiersCmd(),
 		newVersionCmd(),
 	)
 	return root

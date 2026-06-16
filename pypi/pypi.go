@@ -585,3 +585,22 @@ func parsePubDate(s string) string {
 	}
 	return s
 }
+
+// Classifiers fetches all valid PyPI trove classifiers.
+// The endpoint returns plain text with one classifier per line.
+func (c *Client) Classifiers(ctx context.Context) ([]string, error) {
+	u := c.baseURL + "/pypi/classifiers/"
+	body, err := c.get(ctx, u)
+	if err != nil {
+		return nil, fmt.Errorf("fetch classifiers: %w", err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(body)), "\n")
+	var out []string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			out = append(out, line)
+		}
+	}
+	return out, nil
+}

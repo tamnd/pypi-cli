@@ -54,3 +54,8 @@ type SearchResult struct {
 	Description string `json:"description"`
 	URL         string `json:"url"`
 }
+
+// Classifier is one PyPI trove classifier string.
+type Classifier struct {
+	Classifier string `json:"classifier"`
+}
